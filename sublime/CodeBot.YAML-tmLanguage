@@ -10,7 +10,7 @@ patterns:
   match: ^(define|group|bind|auton|math|raw)
 
 - name: keyword.control.flow.python
-  match: (motor|channel|button|group|servo|sensor|loop|init)
+  match: (motor|channel|button|group|servo|sensor|loop|init|constant)
 
 - name: constant.numeric.integer.decimal.python
   match: ([0-9|\.|\-][A-Z]|[0-9|\.|\-]|\$[a-zA-Z\_]+)
@@ -26,7 +26,7 @@ patterns:
   name: comment.line.number-sign.python
 
 - name: support.function.builtin.python
-  match: (input|port|sensitivity|reversed|run|rest)
+  match: (input|port|sensitivity|reversed|run|rest|value)
 
 - name: meta.preprocessor.c
   match: ([a-zA-Z\_]+)

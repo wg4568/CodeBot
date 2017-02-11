@@ -45,10 +45,19 @@ class Command:
 				self.reversed = ("reversed" in self.args)
 				for arg in self.args:
 					if "port" in arg.split():
-						self.port = int(arg.split()[1])
+						self.port = arg.split()[1]
+
 				if self.reversed: rv = ",reversed"
 				else: rv = ""
 				self.code = "#pragma config(Motor,port%s,MOTOR_%s,tmotorVex393_MC29,openLoop%s)\n" % (self.port, self.name, rv)
+
+			if self.first[1] == "constant":
+				self.type = "constant"
+				self.name = self.first[2]
+				for arg in self.args:
+					arg = arg.split()
+					if arg[0] == "value":
+						self.value = base_type(arg[1])
 
 		if self.type == "group":
 			if self.first[1] == "motor":
@@ -72,9 +81,9 @@ class Command:
 					if s[0] == "input":
 						self.inputs.append(s)
 					if s[0] == "sensitivity":
-						self.sensitivity = float(s[1])
+						self.sensitivity = s[1]
 					if s[0] == "rest":
-						self.rest = float(s[1])
+						self.rest = s[1]
 				self.loopcode = "@@BIND_%s();&" % (self.boundto)
 				if self.boundtotype == "channel":
 					self.code = "void BIND_%s()?{&@GROUP_%s(vexRT[Ch%s]?*?%s);&}&" % (self.boundto, self.boundto, self.inputs[0][1], self.sensitivity)
@@ -82,7 +91,7 @@ class Command:
 					ifs = ""
 					for ip in self.inputs:
 						button = ip[1]
-						speed = float(ip[2])
+						speed = ip[2]
 						bnd = "@GROUP_%s(%s);&" % (self.boundto, speed)
 						ifs += "if?(vexRT[Btn%s])?{&@%s@}?else " % (button, bnd)
 					ifs += "{&@@GROUP_%s(%s);&@}" % (self.boundto, self.rest)
@@ -92,17 +101,34 @@ class Command:
 		if self.type == "auton":
 			self.duration = 0.0
 			for arg in self.args:
+				speedtype = "regular"
 				s = arg.split()
 				if s[0] == "run":
+					if len(arg.split("(")) > 1:
+						spd = arg.split("(")[1].split(")")[0].split(" ")
+						speed = []
+						for sp in spd:
+							speed.append(sp)
+
+						speedtype = "composite"
+					else:
+						speed = s[-2:][0]
 					groups = s[1:-2]
-					speed = float(s[-2:][0])
-					delay = float(s[-1:][0])
-					self.duration += delay
+					delay = s[-1:][0]
+					try:
+						self.duration += float(delay)
+					except Exception as e:				#shhhhhh...
+						pass
 					g1 = ""
 					g2 = ""
-					for g in groups:
-						g1 += "@GROUP_%s(%s);&" % (g, speed)
-						g2 += "@GROUP_%s(%s);&" % (g, 0.0)
+					if speedtype == "regular":
+						for g in groups:
+							g1 += "@GROUP_%s(%s);&" % (g, speed)
+							g2 += "@GROUP_%s(%s);&" % (g, 0.0)
+					else:
+						for g,s in zip(groups, speed):
+							g1 += "@GROUP_%s(%s);&" % (g, s)
+							g2 += "@GROUP_%s(%s);&" % (g, 0.0)
 					self.code += "%s@wait1Msec(%s);&%s" % (g1, delay, g2)
 
 		if self.type == "raw":
@@ -161,21 +187,30 @@ class Code:
 		auton = ""
 		body = ""
 		initcode = ""
-		self.code = "/* Code auto generated from %s - CodeBot language by William Gardner (https://github.com/wg4568/CodeBot/) */\n" % self.src
+		self.code = ""
 
 		rawloop = ""
 		rawinit = ""
 
 		for cmd in self.commands:
+			if cmd.type == "constant":
+				for tochange in self.commands:
+					tochange.code = tochange.code.replace("$%s" % (cmd.name), str(cmd.value))
+					try:
+						tochange.loopcode = tochange.code.replace("$%s" % (cmd.name), str(cmd.value))
+					except ValueError:
+						pass
+
+		for cmd in self.commands:
 			cmd.differentiate()
-			if cmd.code: do_log("[built command] %s" % (cmd.disp_code()))
-			else: do_log("[built command] skipping because no code created - %s" % (cmd))
+			if cmd.code: do_log("[building command] %s" % (cmd.disp_code()))
+			else: do_log("[building command] skipping because no code created - %s" % (cmd))
 			if hasattr(cmd, "loopcode"):
 				loopcode += cmd.loopcode
-			elif cmd.type == "define":
+			if cmd.type == "define":
 				header += cmd.code
 			elif cmd.type == "auton":
-				do_log("[build autonomous] %s steps, takes %s seconds" % (len(cmd.args), cmd.duration/1000))
+				do_log("[built autonomous] %s steps, takes %s seconds" % (len(cmd.args), cmd.duration/1000))
 				auton += cmd.code
 			elif cmd.type == "raw":
 				if cmd.rawtype == "loop":
@@ -197,6 +232,7 @@ class Code:
 			main = "task main"
 
 		self.code += header
+		self.code += "\n/* Code auto generated from %s - CodeBot language by William Gardner (https://github.com/wg4568/CodeBot/) */\n" % self.src
 		auton = "task autonomous()?{&%s}&" % (auton)
 		self.code += body
 		self.code += auton

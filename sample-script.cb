@@ -1,3 +1,5 @@
+!* competition=True, custom=True, tidy=True *!
+
 /* CODE FOR TEAM 6374B, BIONIC BRUINS */
 /* BY WILLIAM GARDNER */
 
@@ -6,17 +8,17 @@ define motor arm_right_upper {
 	reversed
 };
 define motor arm_right_lower {
-	port 3,
-	reversed
+	port 3
 };
 define motor arm_left_upper {
 	port 4
 };
 define motor arm_left_lower {
-	port 5
+	port 5,
+	reversed
 };
 define motor base_front_left {
-	port 6
+	port 6,
 };
 define motor base_back_left {
 	port 7
@@ -46,8 +48,12 @@ group motor arm_unit {
 	arm_left_lower
 };
 
+define constant arm_speed {
+	value 123
+};
+
 bind group arm_unit button {
-	input 6U 100,
+	input 6U $arm_speed,
 	input 6D -50,
 	rest 20
 };
@@ -63,8 +69,13 @@ bind group base_right channel {
 };
 
 auton {
-	run latch 25 500,
+	run base_left base_right -100 500,
+	run latch -100 500,
+	run arm_unit 100 250,
+	run arm_unit -100 250,
 	run base_left base_right 100 1000,
 	run arm_unit 100 500,
-	run base_left base_right -100 1000
-}
+	run base_left base_right (100 -100) 1000,
+	run base_right base_left -100 2500,
+	run arm_unit 100 1500
+};

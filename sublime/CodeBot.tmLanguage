@@ -18,7 +18,7 @@
 		</dict>
 		<dict>
 			<key>match</key>
-			<string>(motor|channel|button|group|servo|sensor|loop|init)</string>
+			<string>(motor|channel|button|group|servo|sensor|loop|init|constant)</string>
 			<key>name</key>
 			<string>keyword.control.flow.python</string>
 		</dict>
@@ -52,7 +52,7 @@
 		</dict>
 		<dict>
 			<key>match</key>
-			<string>(input|port|sensitivity|reversed|run|rest)</string>
+			<string>(input|port|sensitivity|reversed|run|rest|value)</string>
 			<key>name</key>
 			<string>support.function.builtin.python</string>
 		</dict>
