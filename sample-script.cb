@@ -1,4 +1,5 @@
-!* competition=True, tidy=True *!
+/* CODE FOR TEAM 6374B, BIONIC BRUINS */
+/* BY WILLIAM GARDNER */
 
 define motor arm_right_upper {
 	port 2,

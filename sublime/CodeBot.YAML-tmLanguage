@@ -1,0 +1,33 @@
+# [PackageDev] target_format: plist, ext: tmLanguage
+---
+name: CodeBot
+scopeName: codebot.cb
+fileTypes: [cb]
+uuid: c7e16b37-8c2d-4fc5-9c01-4bf0f5b803a9
+
+patterns:
+- name: entity.name.function.python
+  match: ^(define|group|bind|auton|math|raw)
+
+- name: keyword.control.flow.python
+  match: (motor|channel|button|group|servo|sensor|loop|init)
+
+- name: constant.numeric.integer.decimal.python
+  match: ([0-9|\.|\-][A-Z]|[0-9|\.|\-]|\$[a-zA-Z\_]+)
+
+- name: constant.numeric.integer.decimal.python
+  match: \!\*.*\*\!
+
+- begin: /\*
+  captures:
+    '0':
+      name: comment.line.number-sign.python
+  end: \*/
+  name: comment.line.number-sign.python
+
+- name: support.function.builtin.python
+  match: (input|port|sensitivity|reversed|run|rest)
+
+- name: meta.preprocessor.c
+  match: ([a-zA-Z\_]+)
+...

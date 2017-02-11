@@ -161,7 +161,7 @@ class Code:
 		auton = ""
 		body = ""
 		initcode = ""
-		self.code = "/* Code auto generated from %s - CodeBot language by William Gardner */\n" % self.src
+		self.code = "/* Code auto generated from %s - CodeBot language by William Gardner (https://github.com/wg4568/CodeBot/) */\n" % self.src
 
 		rawloop = ""
 		rawinit = ""
@@ -227,8 +227,8 @@ code.parse(RAW)
 code.build()
 
 if code.args["logcomment"]:
-		code.code += ("\n\n/* ===== BUILD LOG =====\n\n%s\n ===== END LOG ===== */" % (LOG))
-		code.code += ("\n\n/* ===== SOURCE CODE =====\n\n%s\n ===== END CODE ===== */" % (RAW))
+		code.code += "\n\n/" + ("* ===== BUILD LOG =====\n\n%s\n ===== END LOG ===== *" % (LOG)).replace("/","") + "/"
+		code.code += "\n\n/" + ("* ===== SOURCE CODE =====\n\n%s\n ===== END CODE ===== *" % (RAW)).replace("/","") + "/"
 
 code.write_to_file(OUTPUT)
 
