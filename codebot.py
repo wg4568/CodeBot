@@ -54,6 +54,8 @@ class Command:
 			if self.first[1] == "constant":
 				self.type = "constant"
 				self.name = self.first[2]
+				self.usage = "$%s" % (self.name)
+				print self.name, self.usage
 				for arg in self.args:
 					arg = arg.split()
 					if arg[0] == "value":
@@ -193,15 +195,6 @@ class Code:
 		rawinit = ""
 
 		for cmd in self.commands:
-			if cmd.type == "constant":
-				for tochange in self.commands:
-					tochange.code = tochange.code.replace("$%s" % (cmd.name), str(cmd.value))
-					try:
-						tochange.loopcode = tochange.code.replace("$%s" % (cmd.name), str(cmd.value))
-					except ValueError:
-						pass
-
-		for cmd in self.commands:
 			cmd.differentiate()
 			if cmd.code: do_log("[building command] %s" % (cmd.disp_code()))
 			else: do_log("[building command] skipping because no code created - %s" % (cmd))
@@ -249,6 +242,10 @@ class Code:
 			self.code = self.code.replace("?"," ").replace("&","\n").replace("@","\t")
 		else:
 			self.code = self.code.replace("?","").replace("&","").replace("@","")
+
+		for cmd in self.commands:
+			if cmd.type == "constant":
+				self.code = self.code.replace(cmd.usage, str(cmd.value))
 
 		return self.code
 
