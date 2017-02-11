@@ -31,8 +31,8 @@ define motor latch_motor {
 	reversed
 };
 
-define constant latch_speed {
-	value 25
+define constant base_sensitivity {
+	value 1.0
 };
 
 group motor latch {
@@ -58,24 +58,20 @@ bind group arm_unit button {
 	rest 20
 };
 bind group latch button {
-	input 8D -$latch_speed,
-	input 8R $latch_speed
+	input 8D -25,
+	input 8R 25
 };
 bind group base_left channel {
-	input 3
+	input 3,
+	sensitivity $base_sensitivity
 };
 bind group base_right channel {
-	input 2
+	input 2,
+	sensitivity $base_sensitivity
 };
 
 auton {
-	run base_left base_right -100 500,
+	run base_left base_right -100 1000,
 	run latch -100 500,
-	run arm_unit 100 250,
-	run arm_unit -100 250,
-	run base_left base_right 100 1000,
-	run arm_unit 100 500,
-	run base_left base_right (100 -100) 500,
-	run base_right base_left -100 1000,
 	run arm_unit 100 1250
 };

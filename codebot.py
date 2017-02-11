@@ -55,7 +55,6 @@ class Command:
 				self.type = "constant"
 				self.name = self.first[2]
 				self.usage = "$%s" % (self.name)
-				print self.name, self.usage
 				for arg in self.args:
 					arg = arg.split()
 					if arg[0] == "value":
@@ -120,7 +119,7 @@ class Command:
 					try:
 						self.duration += float(delay)
 					except Exception as e:				#shhhhhh...
-						pass
+						do_log("[warning] autonomous timer does not include constants or variables")
 					g1 = ""
 					g2 = ""
 					if speedtype == "regular":
