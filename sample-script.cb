@@ -71,7 +71,7 @@ bind group base_right channel {
 };
 
 auton {
-	run base_left base_right -100 1000,
+	run base_left base_right -100 1250,
 	run latch -100 500,
 	run arm_unit 100 1250
 };
